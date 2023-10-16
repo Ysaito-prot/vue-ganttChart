@@ -4,6 +4,7 @@ Vue.createApp({
       userInfo: [],
       dragIndex: null,
       dragIndexs: [],
+      deleteElements: [],
       // 課題2「インデント機能」
       indentW: 12,
       selectedItem: [],
@@ -21,16 +22,49 @@ Vue.createApp({
     console.log(this.userInfo);
   },
   methods: {
+    // 課題1「複数選択行の入れ替え」
     dragStart: function (index) {
       this.dragIndex = index;
-      let itemsaito = document.querySelectorAll(".wrapper")[index];
-      itemsaito.classList.add("ui-selected");
     },
     dragEnter: function (index) {
+      // ドラッグ先の要素を取得
+      let dragsaki = this.userInfo[index];
+
       if (index === this.dragIndex) return;
+      // 選択行が1つの場合
+      if (this.dragIndexs.length === 1) {
         let deleteElement = this.userInfo.splice(this.dragIndex, 1)[0];
         this.userInfo.splice(index, 0, deleteElement);
         this.dragIndex = index;
+      }
+      // 選択行が2つ以上の場合
+      if (this.dragIndexs.length > 1) {
+        // 降順に並び替えた後に配列から要素を削除することでズレをなくす
+        this.dragIndexs.sort(function (a, b) {
+          return b.indexNum - a.indexNum;
+        });
+        for (i = 0; i < this.dragIndexs.length; i++) {
+          for (j = 0; j < this.userInfo.length; j++) {
+            if (this.dragIndexs[i].name === this.userInfo[j].name) {
+              let deleteElement = this.userInfo.splice(j, 1)[0];
+              this.deleteElements.push(deleteElement);
+            }
+          }
+        }
+        for (i = 0; i < this.dragIndexs.length; i++) {
+          for (j = 0; j < this.deleteElements.length; j++) {
+            if (this.dragIndexs[i].name === this.deleteElements[j].name) {
+              this.userInfo.splice(index, 0, this.deleteElements[j]);
+            }
+          }
+        }
+        this.deleteElements = [];
+      }
+      this.dragIndex = index;
+    },
+    dragEnd: function () {
+      this.dragIndex = null;
+      this.dragIndexs = [];
       // 選択解除
       this.selectedItem = [];
       this.classCheck();
@@ -39,18 +73,24 @@ Vue.createApp({
     // 行をクリックした場合
     addItem: function (index) {
       let item = document.querySelectorAll(".task_title")[index];
+      let userName = document
+        .querySelectorAll(".userName")
+        [index].innerText.replaceAll("さん", "");
       this.selectedItem = [];
       this.dragIndexs = [];
       this.selectedItem.push(item);
-      this.dragIndexs.push(index);
+      this.dragIndexs.push({ indexNum: index, name: userName });
       this.classCheck();
     },
     // 行をctrlキーを押しながらクリックした場合
     addItem2: function (index) {
       let item = document.querySelectorAll(".task_title")[index];
+      let userName = document
+        .querySelectorAll(".userName")
+        [index].innerText.replaceAll("さん", "");
       if (this.selectedItem.includes(item) === false) {
         this.selectedItem.push(item);
-        this.dragIndexs.push(index);
+        this.dragIndexs.push({ indexNum: index, name: userName });
       }
       this.classCheck();
     },
@@ -134,17 +174,17 @@ Vue.createApp({
       progBar.style.width = progVal + "%";
     },
     // 選択状態確認
-    classCheck: function() {
-        let allLows = document.querySelectorAll(".wrapper");
-        let taskTitle = document.querySelectorAll(".task_title");
-        for (i = 0; i < taskTitle.length; i++){
-          allLows[i].classList.remove("ui-selected");
-          for (j = 0; j < this.selectedItem.length; j++){
-            if (taskTitle[i] === this.selectedItem[j]) {
-              allLows[i].classList.add("ui-selected");
-            }
+    classCheck: function () {
+      let allLows = document.querySelectorAll(".wrapper");
+      let taskTitle = document.querySelectorAll(".task_title");
+      for (i = 0; i < taskTitle.length; i++) {
+        allLows[i].classList.remove("ui-selected");
+        for (j = 0; j < this.selectedItem.length; j++) {
+          if (taskTitle[i] === this.selectedItem[j]) {
+            allLows[i].classList.add("ui-selected");
           }
         }
+      }
     },
   },
 }).mount("#app");

@@ -93,11 +93,11 @@
                 <!-- テーブルボディ ---------------------------------------------------------------------->
                 <table class="column_body column_table">
                     <tbody id="column_table_body">
-                        <tr class="wrapper" v-for="(user, index) in userInfo" :key="user.id" @dragover.prevent :class="{'dragging': index === dragIndex}" :draggable="true" @dragstart.exact="dragStart(index)" @dragenter.exact="dragEnter(index)" @click.exact="addItem(index)" @click.ctrl.exact="addItem2(index)">
+                        <tr class="wrapper" v-for="(user, index) in userInfo" :key="user.id" @dragover.prevent :class="{'dragging': index === dragIndex}" :draggable="true" @dragstart.exact="dragStart(index)" @dragenter.exact="dragEnter(index)" @dragend="dragEnd" @click.exact="addItem(index)" @click.ctrl.exact="addItem2(index)">
                             <!-- 入力列 -->
                             <td class="fixed">{{ user.id }}</td>
                             <td class="fixed task_title">{{ user.taskTitle }}</td>
-                            <td>{{ user.name }}さん</td>
+                            <td class="userName">{{ user.name }}さん</td>
                             <td>
                                 <input type="range" step="10" value="0" id="prog_1" class="prog" min="0" max="100" @change="progBar(index)">
                             </td>
