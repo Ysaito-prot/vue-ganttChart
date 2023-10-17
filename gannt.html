@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>ガントチャート</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="gannt.css" rel="styleSheet">
+    </head>
+    <body>
+        <div id="app">
+            <!-- ヘッダー -->
+            <header>
+                <!-- インデント変更ボタンエリア -->
+                <span id="indentDiv">
+                    <button id="indent_left" @click="indentLeft">←</button>
+                    <button id="indent_right" @click="indentRight">→</button>
+                </span>
+            </header>
+            <!-- ガントチャート -->
+            <main>
+                <!-- テーブルヘッダー ---------------------------------------------------------------------->
+                <table class="column_header column_table">
+                    <thead>
+                        <tr>
+                            <!-- 入力列 -->
+                            <th rowspan="3" class="fixed">No</th>
+                            <th rowspan="3" class="fixed">作業名</th>
+                            <th rowspan="3">担当者</th>
+                            <th rowspan="3">進捗率</th>
+                            <th rowspan="3">状況</th>
+                            <th colspan="3">予定</th>
+                            <th colspan="3">実績</th>
+                            <th rowspan="3">先行</th>
+                            <!-- 日付列 -->
+                            <th colspan="11">2023/2</th>
+                        </tr>
+                        <tr>
+                            <!-- 入力列 - 結合対象セル(CSS設定の兼ね合いで非表示セルを配置) -->
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <!-- 入力列 - 2行目 -->
+                            <th rowspan="2">開始日</th>
+                            <th rowspan="2">終了日</th>
+                            <th rowspan="2">日数</th>
+                            <th rowspan="2">開始日</th>
+                            <th rowspan="2">終了日</th>
+                            <th rowspan="2">日数</th>
+                            <th class="none"></th>
+                            <!-- 日付列 -->
+                            <th id="2023-02-20" class="col_day">20</th>
+                            <th id="2023-02-21" class="col_day">21</th>
+                            <th id="2023-02-22" class="col_day">22</th>
+                            <th id="2023-02-23" class="col_day">23</th>
+                            <th id="2023-02-24" class="col_day">24</th>
+                            <th id="2023-02-25" class="col_day">25</th>
+                            <th id="2023-02-26" class="col_day">26</th>
+                            <th id="2023-02-27" class="col_day">27</th>
+                            <th id="2023-02-28" class="col_day">28</th>
+                            <th id="2023-02-29" class="col_day">29</th>
+                            <th id="2023-02-30" class="col_day">30</th>
+                        </tr>
+                        <tr>
+                            <!-- 入力列 - 結合対象セル(CSS設定の兼ね合いで非表示セルを配置) -->
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <th class="none"></th>
+                            <!-- 日付列 -->
+                            <th>月</th>
+                            <th>火</th>
+                            <th>水</th>
+                            <th>木</th>
+                            <th>金</th>
+                            <th>土</th>
+                            <th>日</th>
+                            <th>月</th>
+                            <th>火</th>
+                            <th>水</th>
+                            <th>木</th>
+                        </tr>
+                    </thead>
+                </table>
+                <!-- テーブルボディ ---------------------------------------------------------------------->
+                <table class="column_body column_table">
+                    <tbody id="column_table_body">
+                        <tr class="wrapper" v-for="(user, index) in userInfo" :key="user.id" @dragover.prevent :class="{'dragging': index === dragIndex}" :draggable="true" @dragstart.exact="dragStart(index)" @dragenter.exact="dragEnter(index)" @dragend="dragEnd" @click.exact="addItem(index)" @click.ctrl.exact="addItem2(index)">
+                            <!-- 入力列 -->
+                            <td class="fixed">{{ user.id }}</td>
+                            <td class="fixed task_title">{{ user.taskTitle }}</td>
+                            <td class="userName">{{ user.name }}さん</td>
+                            <td>
+                                <input type="range" step="10" value="0" id="prog_1" class="prog" min="0" max="100" @change="progBar(index)">
+                            </td>
+                            <td>{{ user.progress }}</td>
+                            <td>
+                                <input type="date" id="planSt_1" class="planSt dateInpt" @change="changePlanDate(index)">
+                            </td>
+                            <td>
+                                <input type="date" id="planEd_1" class="planEd dateInpt" @change="changePlanDate(index)">
+                            </td>
+                            <td id="planDif_1" class="planDif"></td>
+                            <td>
+                                <input type="date" id="actSt_1" class="actSt dateInpt" @change="changeActDate(index)">
+                            </td>
+                            <td>
+                                <input type="date" id="actEd_1" class="actEd dateInpt" @change="changeActDate(index)">
+                            </td>
+                            <td id="actDif_1" class="actDif"></td>
+                            <td></td>
+                            <!-- 日付列 -->
+                            <td class="col_day">
+                                <div id="planBar_1" class="planBar bar">
+                                    <div id="progBar_1" class="progBar"></div>
+                                </div>
+                                <div id="actBar_1" class="actBar bar"></div>
+                            </td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                            <td class="col_day"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </main>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3.2.29/dist/vue.global.js"></script>
+        <script src="gannt.js"></script>
+    </body>
+</html>
